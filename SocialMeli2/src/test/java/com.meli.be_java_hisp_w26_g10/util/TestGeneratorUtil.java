@@ -17,4 +17,7 @@ public class TestGeneratorUtil {
         Buyer buyerTwo = new Buyer(2,"Juan Perez",List.of(new Seller(1,"Meli")));
         return List.of(buyerOne,buyerTwo);
     }
+    public static List<Seller> createSellerEnvironment(){
+        return List.of(new Seller(1,"Meli"), new Seller(2,"Adidas"),new Seller(3,"Levis"));
+    }
 }
