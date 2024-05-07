@@ -1,6 +1,7 @@
 package com.meli.be_java_hisp_w26_g10.service;
 
 import com.api.socialmeli.entity.Buyer;
+import com.api.socialmeli.exception.BadRequestException;
 import com.api.socialmeli.exception.NotFoundException;
 import com.api.socialmeli.repository.IBuyerRepository;
 import com.api.socialmeli.service.impl.BuyerServiceImpl;
@@ -28,7 +29,7 @@ public class BuyerServiceTest {
 
 
     @Test
-    @DisplayName("Obtener la lista de seguidos por usuario de manera exitosa")
+    @DisplayName("Obtener la lista de seguidos por usuario sin un ordenamiento definido de manera exitosa")
     public void GetFollowedListByUserSuccessful(){
         //Arrange
         ObjectMapper mapper = new ObjectMapper();
@@ -46,7 +47,6 @@ public class BuyerServiceTest {
     @DisplayName("Obtener la lista de seguidos de un usuario que no existe")
     public void GetFollowedListByUserNotFound(){
         //Arrange
-        Buyer buyer = new Buyer();
         when(buyerRepository.getById(anyInt())).thenReturn(null);
         //Act && Assert
         assertThrows(NotFoundException.class,
@@ -85,9 +85,15 @@ public class BuyerServiceTest {
     }
 
     @Test
-    @DisplayName("Obtener la lista de seguidos de un usuario con parametros de ordenamiento incorrectos")
-    public void GetFollowedListByUserOrderFailed(){
-
+    @DisplayName("Obtener la lista de seguidos de un usuario con parametros de ordenamiento invalidos")
+    public void GetFollowedListByUserOrderFailedParamsInvalid(){
+        //Arrange
+        Buyer buyer = TestGeneratorUtil.getBuyerById(10);
+        when(buyerRepository.getById(buyer.getUser_id())).thenReturn(buyer);
+        //Act && Assert
+        assertThrows(BadRequestException.class,
+                () -> buyerService.GetFollowedListByUser(buyer.getUser_id(), "any")
+        );
     }
 
 }
