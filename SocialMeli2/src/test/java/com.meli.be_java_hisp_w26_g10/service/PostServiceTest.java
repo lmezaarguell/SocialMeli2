@@ -74,5 +74,33 @@ public class PostServiceTest {
         Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
     }
 
+    @Test
+    @DisplayName("Se ordenan las publicaciones de los vendedores que sigue por fecha ascendente")
+    public void postByFollowedOrderAscTest() {
+        //Arrange
+        List<PostDto> postsDtoResponse;
+
+
+        Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
+
+        List<Post> allPost = TestGeneratorUtil.postListOrderAscTest();
+        List<PostDto> allPostDTO = allPost.stream().map(post -> mapper.convertValue(post, PostDto.class)).toList();
+
+        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
+        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
+
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+        Mockito.when(postRepository.getAll()).thenReturn(allPost);
+
+        //Act
+        postsDtoResponse = postService.getPostsByFollowed(buyer.getUser_id(), "date_asc").getPosts();
+
+        //Assert
+        Assertions.assertEquals(postsDtoResponse, allPostDTO);
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+        Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
+    }
+
 
 }
