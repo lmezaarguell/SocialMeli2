@@ -35,7 +35,6 @@ public class BuyerServiceTest {
         ObjectMapper mapper = new ObjectMapper();
         Buyer buyer = TestGeneratorUtil.getBuyerById(1);
         when(buyerRepository.getById(1)).thenReturn(buyer);
-        when(buyerService.getBuyerById(1)).thenReturn(buyer);
         //Act
         Buyer buyerResult = mapper.convertValue(buyerService
                 .GetFollowedListByUser(buyer.getUser_id(),null),Buyer.class);
