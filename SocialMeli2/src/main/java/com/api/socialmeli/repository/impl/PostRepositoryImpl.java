@@ -31,6 +31,10 @@ public class PostRepositoryImpl implements IPostRepository {
         return post;
     }
 
+    public void saveAll(List<Post> post) {
+        this.post = post;
+    }
+
     @Override
     public Post update(Post post) {
         return null;
