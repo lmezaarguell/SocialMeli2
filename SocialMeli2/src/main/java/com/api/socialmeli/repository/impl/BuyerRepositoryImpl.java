@@ -36,6 +36,10 @@ public class BuyerRepositoryImpl implements IBuyerRepository {
         return buyers;
     }
 
+    public void saveAll(List<Buyer> buyers) {
+        this.buyers = buyers;
+    }
+
     @Override
     public Buyer update(Buyer buyer) {
         return null;
