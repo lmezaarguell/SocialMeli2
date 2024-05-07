@@ -72,7 +72,16 @@ public class BuyerServiceTest {
     @Test
     @DisplayName("Obtener la lista de seguidos de un usuario ordenada descendentemente")
     public void GetFollowedListByUserOrderDownwardSuccessful(){
-
+        //Arrange
+        ObjectMapper mapper = new ObjectMapper();
+        Buyer buyer = TestGeneratorUtil.getBuyerById(10);
+        buyer.setFollowed(TestGeneratorUtil.OrderFollowedListByName("name_desc",buyer.getFollowed()));
+        when(buyerRepository.getById(buyer.getUser_id())).thenReturn(buyer);
+        //Act
+        Buyer response = mapper.convertValue(buyerService
+                .GetFollowedListByUser(buyer.getUser_id(),"name_desc"),Buyer.class);
+        //Assert
+        assertTrue(CollectionUtils.isEqualCollection(buyer.getFollowed(),response.getFollowed()));
     }
 
     @Test
