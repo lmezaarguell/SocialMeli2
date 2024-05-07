@@ -1,6 +1,7 @@
 package com.meli.be_java_hisp_w26_g10.service;
 
 import com.api.socialmeli.entity.Buyer;
+import com.api.socialmeli.exception.NotFoundException;
 import com.api.socialmeli.repository.IBuyerRepository;
 import com.api.socialmeli.service.impl.BuyerServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BuyerServiceTest {
@@ -44,19 +46,15 @@ public class BuyerServiceTest {
     @Test
     @DisplayName("Obtener la lista de seguidos de un usuario que no existe")
     public void GetFollowedListByUserNotFound(){
-
-    }
-
-    @Test
-    @DisplayName("validar que funcione el ordenamiento ascendente")
-    public void ValidateOrderUpwardSuccessful(){
-
-    }
-
-    @Test
-    @DisplayName("validar que funcione el ordenamiento descendente")
-    public void ValidateOrderDownwardSuccessful(){
-
+        //Arrange
+        Buyer buyer = new Buyer();
+        when(buyerRepository.getById(anyInt())).thenReturn(buyer);
+        //Act
+        buyerService.GetFollowedListByUser(11,null);
+        //Assert
+        assertThrows(NotFoundException.class,
+                () -> buyerService.GetFollowedListByUser(11, null)
+        );
     }
 
     @Test
