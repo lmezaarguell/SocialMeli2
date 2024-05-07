@@ -7,6 +7,7 @@ import com.api.socialmeli.entity.Buyer;
 import com.api.socialmeli.entity.Seller;
 import com.api.socialmeli.exception.BadRequestException;
 import com.api.socialmeli.exception.NotFoundException;
+import com.api.socialmeli.mapper.ListUserMapper;
 import com.api.socialmeli.repository.IBuyerRepository;
 import com.api.socialmeli.repository.ISellerRepository;
 import com.api.socialmeli.service.ISellerService;
@@ -102,7 +103,7 @@ public class SellerServiceImpl implements ISellerService {
         }
 
         /* se busca si el comprador sigue al vendedor y se agrega el comprador a
-        * lista de seguidos */
+        * lista de seguidores del vendedor */
         List<Buyer> buyersFollowers = new ArrayList<>();
         for(Buyer buyer: buyers){
             Optional<Seller> sellerExist = buyer.getFollowed().stream()
@@ -118,9 +119,7 @@ public class SellerServiceImpl implements ISellerService {
         }
 
         /* se crea su dto de respuesta */
-        List<UserDto> followersDto = buyersFollowers.stream()
-                .map(buyer -> new UserDto(buyer.getUser_id(), buyer.getUser_name()))
-                .collect(Collectors.toList());
+        List<UserDto> followersDto = ListUserMapper.buyerListToUserDtoList(buyersFollowers);
 
         /* se comprueba forma de ordenamiento y se aplica el correspondiente*/
         List<UserDto> sortedList = UserDtoShort.sortList(followersDto, order);
