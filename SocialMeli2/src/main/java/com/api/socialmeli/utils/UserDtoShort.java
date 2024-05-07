@@ -8,10 +8,12 @@ import java.util.stream.Collectors;
 
 public class UserDtoShort {
 
-    /* Se realiza ordenamiento de lista de usuarios por nombre
-    * ascende o desendente
-    *
-    */
+    /**
+     * @descripcion: Se realiza ordenamiento de lista de usuarios por nombre ascende o desendente
+     * @param list
+     * @param order name_asc, name_desc o vacio
+     * @return se retorna una lista de UserDTO de manera ordenada por nombre
+     */
     public static List<UserDto> sortList(List<UserDto> list, String order){
         if(order.equals("name_asc")){
             return list.stream()

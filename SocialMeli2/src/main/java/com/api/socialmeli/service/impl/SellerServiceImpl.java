@@ -81,9 +81,12 @@ public class SellerServiceImpl implements ISellerService {
 
     }
 
-    /*
-    * US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?)
-    * */
+    /**
+     * @descripcion: US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?)
+     * @param seller_id
+     * @param order
+     * @return returna la informacion de un vendedor mas su lista de seguidores con un order
+     */
     @Override
     public FollowedBySellerDto getFollowersOfSeller(int seller_id, String order) {
         /* se comprueba el correcto formato de seller_id y de order */
