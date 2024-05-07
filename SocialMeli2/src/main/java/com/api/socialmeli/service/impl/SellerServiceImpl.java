@@ -34,7 +34,14 @@ public class SellerServiceImpl implements ISellerService {
         return seller;
     }
 
-    // Obtenemos la cuenta de las personas que siguen a un determinado vendedor
+    /**
+     * US-0002: Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor
+     *
+     * Obtenemos el total de followers que tiene un determinado vendedor
+     * @param user_id id del usuario vendedor que buscamos
+     * @return Devolvemos el DTO relacionado a la forma en que necesitamos visualizar
+     * el numero total de followers de un determinado vendedor
+     */
     @Override
     public SellersCountFollowersDto getCountOfSellerFollowers(Integer user_id) {
         //Obtenemos la lista de los vendedores y compradores
