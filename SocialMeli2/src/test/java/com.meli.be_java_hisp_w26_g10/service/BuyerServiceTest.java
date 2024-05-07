@@ -29,7 +29,16 @@ public class BuyerServiceTest {
     @Test
     @DisplayName("Obtener la lista de seguidos por usuario de manera exitosa")
     public void GetFollowedListByUserSuccessful(){
-
+        //Arrange
+        ObjectMapper mapper = new ObjectMapper();
+        Buyer buyer = TestGeneratorUtil.getBuyerById(1);
+        when(buyerRepository.getById(1)).thenReturn(buyer);
+        when(buyerService.getBuyerById(1)).thenReturn(buyer);
+        //Act
+        Buyer buyerResult = mapper.convertValue(buyerService
+                .GetFollowedListByUser(buyer.getUser_id(),null),Buyer.class);
+        //Assert
+        assertEquals(buyer,buyerResult);
     }
 
     @Test
