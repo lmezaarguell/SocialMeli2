@@ -43,8 +43,18 @@ public class BuyerServiceTest {
         verify(repository, times(2)).getById(followerId);
 
     }
+    @Test
+    @DisplayName("Dejar de seguir a un vendedor mandando la excepcion NotFoundException")
+    public void unfollowUserFirstSadPath() {
+        Integer followerId = 1;
+        Integer unfollowId = 2;
 
 
+        when(repository.getById(followerId)).thenReturn(null);
+
+        Assertions.assertThrows(NotFoundException.class, () -> service.unfollowUser(followerId, unfollowId));
+
+    }
 
 
 }
