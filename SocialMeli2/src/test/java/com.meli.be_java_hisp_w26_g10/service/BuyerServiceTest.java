@@ -1,30 +1,68 @@
 package com.meli.be_java_hisp_w26_g10.service;
+
 import com.api.socialmeli.entity.Buyer;
+import com.api.socialmeli.entity.Seller;
 import com.api.socialmeli.exception.BadRequestException;
-import com.api.socialmeli.exception.NotFoundException;
+import com.api.socialmeli.repository.impl.BuyerRepositoryImpl;
 import com.api.socialmeli.service.impl.BuyerServiceImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.meli.be_java_hisp_w26_g10.util.TestGeneratorUtil;
+import com.api.socialmeli.service.impl.SellerServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.ArrayList;
+import java.util.List;
+import static org.mockito.Mockito.when;
+import com.api.socialmeli.exception.NotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meli.be_java_hisp_w26_g10.util.TestGeneratorUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
-import com.api.socialmeli.repository.impl.BuyerRepositoryImpl;
-import org.junit.jupiter.api.Assertions;
 @ExtendWith(MockitoExtension.class)
 public class BuyerServiceTest {
 
+
+
     @Mock
-    BuyerRepositoryImpl repository;
+    BuyerRepositoryImpl buyerRepository;
+    @Mock
+    SellerServiceImpl sellerService;
 
     @InjectMocks
-    BuyerServiceImpl service;
+    BuyerServiceImpl buyerService;
+
+    @Test
+    @DisplayName("Seguir a un usuario exitosamente")
+    public void followSuccessfullyAnUser(){
+        //Act && Arrange
+        Buyer buyer = new Buyer(15, "Nicolas", new ArrayList<>());
+        Seller seller = new Seller(15, "Nike");
+        Buyer finalBuyer = new Buyer(15, "Nicolas", List.of(seller));
+        when(sellerService.getSellerById(seller.getUser_id())).thenReturn(seller);
+        when(buyerRepository.getById(buyer.getUser_id())).thenReturn(buyer);
+        when(buyerRepository.followUser(buyer,seller)).thenReturn(finalBuyer);
+        Buyer buyerReturned = buyerService.followUser(buyer.getUser_id(),seller.getUser_id());
+        //Assert
+        Assertions.assertEquals(finalBuyer, buyerReturned);
+    }
+
+    @Test
+    @DisplayName("Seguir a un usuario el cual ya se seguia previamente")
+    public void followUserTwice(){
+        //Act && Arrange
+        Seller seller = new Seller(15, "Nike");
+        Buyer buyer = new Buyer(15, "Nicolas", List.of(seller));
+        when(sellerService.getSellerById(seller.getUser_id())).thenReturn(seller);
+        when(buyerRepository.getById(buyer.getUser_id())).thenReturn(buyer);
+        //Assert
+        Assertions.assertThrows(BadRequestException.class,
+                () -> buyerService.followUser(buyer.getUser_id(),seller.getUser_id()));
+    }
 
     @Test
     @DisplayName("Realizar la accion de dejar de seguir a un vendedor de forma exitosa")
@@ -35,11 +73,11 @@ public class BuyerServiceTest {
 
         Buyer buyerExpected = TestGeneratorUtil.getSingleBuyer();
 
-        when(repository.getById(followerId)).thenReturn(buyerExpected);
+        when(buyerRepository.getById(followerId)).thenReturn(buyerExpected);
 
-        service.unfollowUser(followerId, unfollowId);
+        buyerService.unfollowUser(followerId, unfollowId);
 
-        verify(repository, times(2)).getById(followerId);
+        verify(buyerRepository, times(2)).getById(followerId);
 
     }
     @Test
@@ -49,9 +87,9 @@ public class BuyerServiceTest {
         Integer unfollowId = 2;
 
 
-        when(repository.getById(followerId)).thenReturn(null);
+        when(buyerRepository.getById(followerId)).thenReturn(null);
 
-        Assertions.assertThrows(NotFoundException.class, () -> service.unfollowUser(followerId, unfollowId));
+        Assertions.assertThrows(NotFoundException.class, () -> buyerService.unfollowUser(followerId, unfollowId));
 
     }
 
@@ -63,9 +101,9 @@ public class BuyerServiceTest {
 
         Buyer buyerExpected = TestGeneratorUtil.getSingleBuyer();
 
-        when(repository.getById(followerId)).thenReturn(buyerExpected);
+        when(buyerRepository.getById(followerId)).thenReturn(buyerExpected);
 
-        Assertions.assertThrows(NotFoundException.class, () -> service.unfollowUser(followerId, unfollowId));
+        Assertions.assertThrows(NotFoundException.class, () -> buyerService.unfollowUser(followerId, unfollowId));
 
     }
 
@@ -75,9 +113,9 @@ public class BuyerServiceTest {
         //Arrange
         ObjectMapper mapper = new ObjectMapper();
         Buyer buyer = TestGeneratorUtil.getBuyerById(1);
-        when(repository.getById(1)).thenReturn(buyer);
+        when(buyerRepository.getById(1)).thenReturn(buyer);
         //Act
-        Buyer buyerResult = mapper.convertValue(service
+        Buyer buyerResult = mapper.convertValue(buyerService
                 .GetFollowedListByUser(buyer.getUser_id(),null),Buyer.class);
         //Assert
         assertEquals(buyer,buyerResult);
@@ -87,10 +125,10 @@ public class BuyerServiceTest {
     @DisplayName("Obtener la lista de seguidos de un usuario que no existe")
     public void GetFollowedListByUserNotFound(){
         //Arrange
-        when(repository.getById(anyInt())).thenReturn(null);
+        when(buyerRepository.getById(anyInt())).thenReturn(null);
         //Act && Assert
         assertThrows(NotFoundException.class,
-                () -> service.GetFollowedListByUser(11, null)
+                () -> buyerService.GetFollowedListByUser(11, null)
         );
     }
 
@@ -101,9 +139,9 @@ public class BuyerServiceTest {
         ObjectMapper mapper = new ObjectMapper();
         Buyer buyer = TestGeneratorUtil.getBuyerById(10);
         buyer.setFollowed(TestGeneratorUtil.OrderFollowedListByName("name_asc",buyer.getFollowed()));
-        when(repository.getById(buyer.getUser_id())).thenReturn(buyer);
+        when(buyerRepository.getById(buyer.getUser_id())).thenReturn(buyer);
         //Act
-        Buyer response = mapper.convertValue(service
+        Buyer response = mapper.convertValue(buyerService
                 .GetFollowedListByUser(buyer.getUser_id(),"name_asc"),Buyer.class);
         //Assert
         assertTrue(CollectionUtils.isEqualCollection(buyer.getFollowed(),response.getFollowed()));
@@ -116,9 +154,9 @@ public class BuyerServiceTest {
         ObjectMapper mapper = new ObjectMapper();
         Buyer buyer = TestGeneratorUtil.getBuyerById(10);
         buyer.setFollowed(TestGeneratorUtil.OrderFollowedListByName("name_desc",buyer.getFollowed()));
-        when(repository.getById(buyer.getUser_id())).thenReturn(buyer);
+        when(buyerRepository.getById(buyer.getUser_id())).thenReturn(buyer);
         //Act
-        Buyer response = mapper.convertValue(service
+        Buyer response = mapper.convertValue(buyerService
                 .GetFollowedListByUser(buyer.getUser_id(),"name_desc"),Buyer.class);
         //Assert
         assertTrue(CollectionUtils.isEqualCollection(buyer.getFollowed(),response.getFollowed()));
@@ -129,10 +167,10 @@ public class BuyerServiceTest {
     public void GetFollowedListByUserOrderFailedParamsInvalid(){
         //Arrange
         Buyer buyer = TestGeneratorUtil.getBuyerById(10);
-        when(repository.getById(buyer.getUser_id())).thenReturn(buyer);
+        when(buyerRepository.getById(buyer.getUser_id())).thenReturn(buyer);
         //Act && Assert
         assertThrows(BadRequestException.class,
-                () -> service.GetFollowedListByUser(buyer.getUser_id(), "any")
+                () -> buyerService.GetFollowedListByUser(buyer.getUser_id(), "any")
         );
     }
 
