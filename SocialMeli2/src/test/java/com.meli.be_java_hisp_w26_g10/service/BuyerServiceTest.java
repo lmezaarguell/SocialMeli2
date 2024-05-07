@@ -12,9 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.apache.commons.collections4.CollectionUtils;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
@@ -48,10 +47,8 @@ public class BuyerServiceTest {
     public void GetFollowedListByUserNotFound(){
         //Arrange
         Buyer buyer = new Buyer();
-        when(buyerRepository.getById(anyInt())).thenReturn(buyer);
-        //Act
-        buyerService.GetFollowedListByUser(11,null);
-        //Assert
+        when(buyerRepository.getById(anyInt())).thenReturn(null);
+        //Act && Assert
         assertThrows(NotFoundException.class,
                 () -> buyerService.GetFollowedListByUser(11, null)
         );
@@ -60,7 +57,16 @@ public class BuyerServiceTest {
     @Test
     @DisplayName("Obtener la lista de seguidos de un usuario ordenada ascendentemente")
     public void GetFollowedListByUserOrderUpwardSuccessful(){
-
+        //Arrange
+        ObjectMapper mapper = new ObjectMapper();
+        Buyer buyer = TestGeneratorUtil.getBuyerById(10);
+        buyer.setFollowed(TestGeneratorUtil.OrderFollowedListByName("name_asc",buyer.getFollowed()));
+        when(buyerRepository.getById(buyer.getUser_id())).thenReturn(buyer);
+        //Act
+        Buyer response = mapper.convertValue(buyerService
+                .GetFollowedListByUser(buyer.getUser_id(),"name_asc"),Buyer.class);
+        //Assert
+        assertTrue(CollectionUtils.isEqualCollection(buyer.getFollowed(),response.getFollowed()));
     }
 
     @Test
