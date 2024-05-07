@@ -21,9 +21,13 @@ public class ProductController {
         return new ResponseEntity<>(this.postService.publishPost(postDto), HttpStatus.OK);
     }
 
-    /*
-    US 0006 and US009: Se agrega la función en el controlador para direccionar el endpoint 6 y 9 de la API
-    */
+    /**
+     * US 0006 and US009
+     * @param userId: identificador de usuario comprador
+     * @param order: el nombre del orden que se aplica a los post por fecha
+     * @return devuelve el dto con el id del usuario y los post de los vendedores que sigue el comprador
+     *
+     */
     @GetMapping("/followed/{userId}/list")
     public ResponseEntity<?> getPostsByFollowed(@PathVariable Integer userId, @RequestParam(required = false) String order) {
         return ResponseEntity.ok().body(postService.getPostsByFollowed(userId, order));
