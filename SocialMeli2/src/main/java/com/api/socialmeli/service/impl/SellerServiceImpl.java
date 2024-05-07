@@ -10,6 +10,7 @@ import com.api.socialmeli.exception.NotFoundException;
 import com.api.socialmeli.repository.IBuyerRepository;
 import com.api.socialmeli.repository.ISellerRepository;
 import com.api.socialmeli.service.ISellerService;
+import com.api.socialmeli.utils.FollowersOfSellerValidation;
 import com.api.socialmeli.utils.UserDtoShort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -84,15 +85,9 @@ public class SellerServiceImpl implements ISellerService {
     * */
     @Override
     public FollowedBySellerDto getFollowersOfSeller(int seller_id, String order) {
-        /* se realiza validacion dentro del id del venedor enviado */
-        if(seller_id <= 0){
-            throw new BadRequestException("El id del vendedor no puede ser menor o igual a cero");
-        }
-
-        /* se realiza validacion dentro del order enviado */
-        if(!order.equals("name_desc") && !order.equals("name_asc") && !order.equals("")){
-            throw new BadRequestException("El tipo de ordenamiento no es el permitido");
-        }
+        /* se comprueba el correcto formato de seller_id y de order */
+        FollowersOfSellerValidation.isValidSellerId(seller_id);
+        FollowersOfSellerValidation.isValidOrder(order);
 
         /* se comprueba que el vendedor exista */
         Seller seller = iSellerRepository.getById(seller_id);
