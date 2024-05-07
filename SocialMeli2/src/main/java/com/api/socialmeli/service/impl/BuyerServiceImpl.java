@@ -49,20 +49,27 @@ public class BuyerServiceImpl implements IBuyerService {
         if (buyer == null) throw new NotFoundException("El usuario no existe o no se encuentra registrado.");
         return buyer;
     }
-    /*
-    US 0007: Poder realizar la acción de “Unfollow” (dejar de seguir) a un determinado vendedor.
+    /**
+     * US 0007: Poder realizar la acción de “Unfollow” (dejar de seguir) a un determinado vendedor.
+     * Inicialmente Traemos un comprador del repositorio de acuerdo al parametro del método.
+     * Si es null significa que no existe un usuario con tal Id en el repositorio por lo tanto hay que lanzar una
+     * excepción
+     * Mediante el siguiente lambda obtendremos los compradores seguidos por el usuario en caso de null de nuevo,
+     * debemos lanzar una excepcion.
+     * Finalmente mediante un lambda eliminaremos la relacion existente entre el comprador y el vendedor,
+     * cabe resaltar que siempre se hara sobre el repositorio con el fin de modificar su estado y que se vea reflejado ese
+     * cambio para todo el sistema.
+     * @param followerId
+     * @param toUnfollowId
      */
     @Override
     public void unfollowUser(Integer followerId, Integer toUnfollowId) {
-        //Traemos un comprador del repositorio de acuerdo al parametro del metodo
         Buyer buyer = buyerRepository.getById(followerId);
-        //Si es null significa que no existe un usuario con tal Id en el repositorio por lo tanto hay que lanzar una
-        //excepcion
+
         if(buyer == null){
             throw new NotFoundException("El usuario no existe");
         }
-        //Mediante el siguiente lambda obtendremos los compradores seguidos por el usuario en caso de null de nuevo,
-        //debemos lanzar una excepcion
+
         Seller sellerToUnfollow = buyer.getFollowed().
                                              stream().
                                              filter(e->e.getUser_id().equals(toUnfollowId)).
@@ -71,11 +78,7 @@ public class BuyerServiceImpl implements IBuyerService {
         if(sellerToUnfollow == null){
             throw new NotFoundException("No sigues al vendedor ");
         }
-         /*
-        Finalmente mediante un lambda eliminaremos la relacion existente entre el comprador y el vendedor,
-        cabe resaltar que siempre se hara sobre el repositorio con el fin de modificar su estado y que se vea reflejado ese
-        cambio para todo el sistema.
-         */
+
         buyerRepository.getById(followerId).getFollowed().removeIf(e->e.getUser_id().equals(toUnfollowId));
     }
     //Servicio que implementa la logica para obtener la lista de todos los vendedores que sigue
