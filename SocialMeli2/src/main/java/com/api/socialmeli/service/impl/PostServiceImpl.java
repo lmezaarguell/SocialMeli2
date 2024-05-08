@@ -24,15 +24,15 @@ import java.util.List;
 @Service
 public class PostServiceImpl implements IPostService {
 
+    private static final String ORDER_DATE_ASC = "date_asc";
+    private static final String ORDER_DATE_DESC = "date_desc";
+
     @Autowired
     private IBuyerService buyerService;
     @Autowired
     private IPostRepository postRepository;
     @Autowired
     private ISellerRepository sellerRepository;
-
-    // MCaldera - Declaracion de array para almacenamiento de datos
-    private final List<Post> posts = new ArrayList<>();
     private int postId;
 
     @Override
@@ -42,19 +42,20 @@ public class PostServiceImpl implements IPostService {
         return post;
     }
 
+    /**
+     *
+     * @param postDto: Array de datos de entrada
+     * @return retorna el array de datos que se almacenan
+     */
     @Override
     public PostDto publishPost(PostDto postDto) {
         Integer userId = postDto.getUser_id();
-
         boolean found = sellerRepository.getAll().stream().anyMatch(seller -> seller.getUser_id() == userId);
-
-
         if (!found) {
             throw new BadRequestException("No hay vendedor con el id: " + userId);
         }
-
         // generacion de consecutivo 'post_id'
-        generatePostId();
+        postId = this.postRepository.searchPostId();
         // seteo de consecutivo generado
         postDto.setPost_id(postId);
         // conversion de dto a objeto
@@ -66,17 +67,11 @@ public class PostServiceImpl implements IPostService {
         return postDto;
     }
 
-    // MCaldera - funcion de generacion de consecutivo de 'post_id'
-    private int generatePostId() {
-        if (posts.isEmpty()) {
-            postId = this.postRepository.searchPostId();
-        } else {
-            postId = (posts.stream().mapToInt(Post::getPost_id).max().orElse(0) + 1);
-        }
-        return postId;
-    }
-
-    // MCaldera - Metodo main para el retorno del objeto
+    /**
+     *
+     * @param postDto: Array de datos de entrada
+     * @return retorna el objeto al cual se le desea realizar el proceso
+     */
     private Post convertToPost(PostDto postDto) {
         try {
             ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
@@ -86,7 +81,12 @@ public class PostServiceImpl implements IPostService {
         }
     }
 
-    //La funcion devuelve el listado de post de los vendedores que sigue filtrados por fecha
+    /**
+     *
+     * @param userId: identificador del usuario comprador que sigue a los vendedores
+     * @param order: nombre del tipo de orden que se le aplicara a la fecha de los post
+     * @return retorna el listado de las publicaciones de los vendedores que sigue filtrados por fecha
+     */
     @Override
     public PostsByFollowedDto getPostsByFollowed(Integer userId, String order) {
         //Se busca el comprador y se guarda en una instacia de buyer con el id del usuario recibido
@@ -119,25 +119,38 @@ public class PostServiceImpl implements IPostService {
         return postByFollowedDto;
     }
 
-    /*Determina si el post es del vendedor que esta siguiendo, con la lista de ids de los vendedores que sigue
-      y el id del creador de la publicacion*/
+    /**
+     *
+     * @param idUser: identificador del vendedor dueño del post
+     * @param ids: identificadores de los vendedores que sigue el comprador
+     * @return Determina si el post es del vendedor que esta siguiendo
+     */
     private boolean findIdInPost(Integer idUser, List<Integer> ids) {
         return ids.stream().anyMatch(id -> id.equals(idUser));
     }
 
-    //Ordena la lista de post por fecha segun el orden enviado por parametro
+    /**
+     *
+     * @param posts: la lista de los post
+     * @param order: el nombre del orden que se aplica a la fecha de los post
+     * @return devuelve la lista de post ordenados por fecha segun el orden enviado por parametro
+     */
     List<Post> orderPostByDate(List<Post> posts, String order) {
-        if (order == null || order.equalsIgnoreCase("date_desc")) {
+        if (order == null || order.equalsIgnoreCase(ORDER_DATE_DESC)) {
             return posts.stream().sorted(Comparator.comparing(Post::getDate).reversed()).toList();
-        } else if (order.equalsIgnoreCase("date_asc")) {
+        } else if (order.equalsIgnoreCase(ORDER_DATE_ASC)) {
             return posts.stream().sorted(Comparator.comparing(Post::getDate)).toList();
         } else {
             throw new BadRequestException("El orden pedido no es valido");
         }
     }
 
-    /*La funcion devuelve el listado de las publicaciones de los vendedores a los que sigue
-    filtrados  por el criterio de fecha*/
+    /**
+     *
+     * @param buyer: el comprador
+     * @return La funcion devuelve el listado de las publicaciones de los vendedores a los que sigue
+     *     filtrados  por el criterio de fecha
+     */
     private List<Post> getPostsByFollowedFilter(Buyer buyer){
         //Se obtine la lista de ids de los compradores que sigue el comprador
         List<Integer> ids = buyer.getFollowed().stream().map(Seller::getUser_id).toList();

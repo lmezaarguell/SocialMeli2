@@ -1,6 +1,7 @@
 package com.api.socialmeli.dto;
 
 import com.api.socialmeli.entity.Seller;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,5 +26,5 @@ public class BuyerFollowedListDTO {
     @Size(max = 15, message = "El nombre no puede ser mayor a 15 caracteres")
     private String user_name;
 
-    private List<Seller> followed;
+    private List<@Valid Seller> followed;
 }
