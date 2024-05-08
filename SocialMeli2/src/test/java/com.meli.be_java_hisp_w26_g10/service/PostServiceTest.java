@@ -21,6 +21,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,15 +54,10 @@ public class PostServiceTest {
         //Arrange
         List<PostDto> postsDtoResponse;
 
-
         Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
 
         List<Post> allPost = TestGeneratorUtil.postListOrderDesTest();
         List<PostDto> allPostDTO = allPost.stream().map(post -> mapper.convertValue(post, PostDto.class)).toList();
-
-        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
-        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
-
 
         Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
         Mockito.when(postRepository.getAll()).thenReturn(allPost);
@@ -80,15 +77,10 @@ public class PostServiceTest {
         //Arrange
         List<PostDto> postsDtoResponse;
 
-
         Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
 
         List<Post> allPost = TestGeneratorUtil.postListOrderAscTest();
         List<PostDto> allPostDTO = allPost.stream().map(post -> mapper.convertValue(post, PostDto.class)).toList();
-
-        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
-        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
-
 
         Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
         Mockito.when(postRepository.getAll()).thenReturn(allPost);
@@ -109,14 +101,53 @@ public class PostServiceTest {
 
         List<Post> posts = TestGeneratorUtil.postListOrderAscTest();
 
-        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
-        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
-
         Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
         Mockito.when(postRepository.getAll()).thenReturn(posts);
 
-        List<PostDto> posts2 = postService.getPostsByFollowed(buyer.getUser_id() ,"date_desc").getPosts();
+        postService.getPostsByFollowed(buyer.getUser_id() ,"date_desc").getPosts();
 
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+        Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
+    }
+
+    @Test
+    @DisplayName("Publicaciones cuando el comprador no sigue a ningun vendedor")
+    public void buyerWithoutSellers() {
+        //Arrange
+        List<PostDto> postsDtoResponse;
+
+        Buyer buyer = TestGeneratorUtil.buyersWithoutSellers();
+        List<PostDto> allPostDTO = new ArrayList<>();
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+
+        //Act
+        postsDtoResponse = postService.getPostsByFollowed(buyer.getUser_id(), null).getPosts();
+
+        //Assert
+        Assertions.assertEquals(postsDtoResponse, allPostDTO);
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+    }
+
+    @Test
+    @DisplayName("Publicaciones cuando los vendedores que sigue el comprador no tiene publicaciones")
+    public void postByFollowedWithoutPost() {
+        //Arrange
+        List<PostDto> postsDtoResponse;
+
+        Buyer buyer = TestGeneratorUtil.buyersWithSellersWithoutPost();
+
+        List<Post> allPost = TestGeneratorUtil.postList();
+        List<PostDto> allPostDTO = new ArrayList<>();
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+        Mockito.when(postRepository.getAll()).thenReturn(allPost);
+
+        //Act
+        postsDtoResponse = postService.getPostsByFollowed(buyer.getUser_id(), null).getPosts();
+
+        //Assert
+        Assertions.assertEquals(postsDtoResponse, allPostDTO);
         Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
         Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
     }
@@ -128,13 +159,10 @@ public class PostServiceTest {
 
         List<Post> posts = TestGeneratorUtil.postListOrderAscTest();
 
-        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
-        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
-
         Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
         Mockito.when(postRepository.getAll()).thenReturn(posts);
 
-        List<PostDto> posts2 = postService.getPostsByFollowed(buyer.getUser_id() ,"date_asc").getPosts();
+        postService.getPostsByFollowed(buyer.getUser_id() ,"date_asc").getPosts();
 
         Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
         Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
@@ -147,13 +175,10 @@ public class PostServiceTest {
 
         List<Post> posts = TestGeneratorUtil.postListOrderAscTest();
 
-        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
-        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
-
         Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
         Mockito.when(postRepository.getAll()).thenReturn(posts);
 
-        List<PostDto> posts2 = postService.getPostsByFollowed(buyer.getUser_id() ,null).getPosts();
+        postService.getPostsByFollowed(buyer.getUser_id() ,null).getPosts();
 
         Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
         Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
@@ -166,13 +191,35 @@ public class PostServiceTest {
 
         List<Post> posts = TestGeneratorUtil.postListOrderAscTest();
 
-        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
-        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
-
         Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
         Mockito.when(postRepository.getAll()).thenReturn(posts);
 
         Assertions.assertThrows(BadRequestException.class, ()-> postService.getPostsByFollowed(buyer.getUser_id() ,"").getPosts());
     }
+
+    @Test
+    @DisplayName("Publicaciones de los vendedores en los ultimos 15 dias")
+    public void postByFollowedLastDaysTest() {
+        //Arrange
+        List<PostDto> postsDtoResponse;
+
+        Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
+        List<Post> allPost = TestGeneratorUtil.postList();
+        List<PostDto> allPostDTO = Arrays.asList(allPost.get(0),allPost.get(1)).stream()
+                .map(post -> mapper.convertValue(post, PostDto.class)).toList();
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+        Mockito.when(postRepository.getAll()).thenReturn(allPost);
+
+        //Act
+        postsDtoResponse = postService.getPostsByFollowed(buyer.getUser_id(), null).getPosts();
+
+        //Assert
+        Assertions.assertEquals(postsDtoResponse, allPostDTO);
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+        Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
+    }
+
+
 
 }
