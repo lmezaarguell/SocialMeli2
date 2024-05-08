@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -194,6 +195,29 @@ public class PostServiceTest {
         Mockito.when(postRepository.getAll()).thenReturn(posts);
 
         Assertions.assertThrows(BadRequestException.class, ()-> postService.getPostsByFollowed(buyer.getUser_id() ,"").getPosts());
+    }
+
+    @Test
+    @DisplayName("Publicaciones de los vendedores en los ultimos 15 dias")
+    public void postByFollowedLastDaysTest() {
+        //Arrange
+        List<PostDto> postsDtoResponse;
+
+        Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
+        List<Post> allPost = TestGeneratorUtil.postList();
+        List<PostDto> allPostDTO = Arrays.asList(allPost.get(0),allPost.get(1)).stream()
+                .map(post -> mapper.convertValue(post, PostDto.class)).toList();
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+        Mockito.when(postRepository.getAll()).thenReturn(allPost);
+
+        //Act
+        postsDtoResponse = postService.getPostsByFollowed(buyer.getUser_id(), null).getPosts();
+
+        //Assert
+        Assertions.assertEquals(postsDtoResponse, allPostDTO);
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+        Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
     }
 
 
