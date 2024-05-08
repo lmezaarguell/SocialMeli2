@@ -64,13 +64,20 @@ public class PostRepositoryImpl implements IPostRepository {
         return posts;
     }
 
-    // MCaldera - Funcion de busqueda de valor maximo ´post_id´en json, para generar consecutivo
+    /**
+     *
+     * @return retorna el consecutivo para la creacion de posts
+     */
     @Override
     public int searchPostId(){
         int max = this.post.stream().mapToInt(Post::getPost_id).max().orElse(0);
         return max + 1;
     }
 
+    /**
+     *
+     * @param post: Objeto a almacenar
+     */
     @Override
     public void savePost(Post post){
         this.post.add(post);

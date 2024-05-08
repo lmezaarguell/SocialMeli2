@@ -33,9 +33,6 @@ public class PostServiceImpl implements IPostService {
     private IPostRepository postRepository;
     @Autowired
     private ISellerRepository sellerRepository;
-
-    // MCaldera - Declaracion de array para almacenamiento de datos
-    private final List<Post> posts = new ArrayList<>();
     private int postId;
 
     @Override
@@ -45,19 +42,20 @@ public class PostServiceImpl implements IPostService {
         return post;
     }
 
+    /**
+     *
+     * @param postDto: Array de datos de entrada
+     * @return retorna el array de datos que se almacenan
+     */
     @Override
     public PostDto publishPost(PostDto postDto) {
         Integer userId = postDto.getUser_id();
-
         boolean found = sellerRepository.getAll().stream().anyMatch(seller -> seller.getUser_id() == userId);
-
-
         if (!found) {
             throw new BadRequestException("No hay vendedor con el id: " + userId);
         }
-
         // generacion de consecutivo 'post_id'
-        generatePostId();
+        postId = this.postRepository.searchPostId();
         // seteo de consecutivo generado
         postDto.setPost_id(postId);
         // conversion de dto a objeto
@@ -69,17 +67,11 @@ public class PostServiceImpl implements IPostService {
         return postDto;
     }
 
-    // MCaldera - funcion de generacion de consecutivo de 'post_id'
-    private int generatePostId() {
-        if (posts.isEmpty()) {
-            postId = this.postRepository.searchPostId();
-        } else {
-            postId = (posts.stream().mapToInt(Post::getPost_id).max().orElse(0) + 1);
-        }
-        return postId;
-    }
-
-    // MCaldera - Metodo main para el retorno del objeto
+    /**
+     *
+     * @param postDto: Array de datos de entrada
+     * @return retorna el objeto al cual se le desea realizar el proceso
+     */
     private Post convertToPost(PostDto postDto) {
         try {
             ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
