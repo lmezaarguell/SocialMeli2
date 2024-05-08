@@ -103,6 +103,12 @@ public class TestGeneratorUtil {
 
     }
 
+    public static Buyer buyersWithSellersWithoutPost() {
+        return new Buyer(10, "Isabel Medina",
+                List.of(new Seller(180,"Camilo Vazquez")));
+
+    }
+
 
     private static List<Product> productsPostListOrderTest() {
         return  List.of(
