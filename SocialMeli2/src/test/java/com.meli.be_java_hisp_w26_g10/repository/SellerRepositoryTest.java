@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 public class SellerRepositoryTest {
 
     SellerRepositoryImpl sellerRepository = new SellerRepositoryImpl();
@@ -26,5 +28,14 @@ public class SellerRepositoryTest {
         Seller sellerObtained = sellerRepository.getById(1);
         //Assert
         Assertions.assertNotNull(sellerObtained);
+    }
+
+    @Test
+    @DisplayName("Obtener todos los usuarios")
+    public void getAllSellers(){
+        //Act && Arrange
+        List<Seller> sellers = sellerRepository.getAll();
+        //Assert
+        Assertions.assertEquals(sellers.size(), 6);
     }
 }
