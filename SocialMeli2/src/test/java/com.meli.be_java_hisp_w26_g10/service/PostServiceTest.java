@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -109,6 +110,25 @@ public class PostServiceTest {
     }
 
     @Test
+    @DisplayName("Test de la devolución de post cuando el comprador no sigue a ningun vendedor")
+    public void buyerWithoutSellers() {
+        //Arrange
+        List<PostDto> postsDtoResponse;
+
+        Buyer buyer = TestGeneratorUtil.buyersWithoutSellers();
+        List<PostDto> allPostDTO = new ArrayList<>();
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+
+        //Act
+        postsDtoResponse = postService.getPostsByFollowed(buyer.getUser_id(), null).getPosts();
+
+        //Assert
+        Assertions.assertEquals(postsDtoResponse, allPostDTO);
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+    }
+
+    @Test
     @DisplayName("Testeo de ejecucion de ordenamiendo por fecha ascendente")
     public void testOrderAscPost() {
         Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
@@ -152,5 +172,7 @@ public class PostServiceTest {
 
         Assertions.assertThrows(BadRequestException.class, ()-> postService.getPostsByFollowed(buyer.getUser_id() ,"").getPosts());
     }
+
+
 
 }
