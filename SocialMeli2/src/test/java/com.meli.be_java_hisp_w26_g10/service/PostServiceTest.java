@@ -110,7 +110,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Test de la devolución de post cuando el comprador no sigue a ningun vendedor")
+    @DisplayName("Publicaciones cuando el comprador no sigue a ningun vendedor")
     public void buyerWithoutSellers() {
         //Arrange
         List<PostDto> postsDtoResponse;
@@ -126,6 +126,29 @@ public class PostServiceTest {
         //Assert
         Assertions.assertEquals(postsDtoResponse, allPostDTO);
         Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+    }
+
+    @Test
+    @DisplayName("Publicaciones cuando los vendedores que sigue el comprador no tiene publicaciones")
+    public void postByFollowedWithoutPost() {
+        //Arrange
+        List<PostDto> postsDtoResponse;
+
+        Buyer buyer = TestGeneratorUtil.buyersWithSellersWithoutPost();
+
+        List<Post> allPost = TestGeneratorUtil.postList();
+        List<PostDto> allPostDTO = new ArrayList<>();
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+        Mockito.when(postRepository.getAll()).thenReturn(allPost);
+
+        //Act
+        postsDtoResponse = postService.getPostsByFollowed(buyer.getUser_id(), null).getPosts();
+
+        //Assert
+        Assertions.assertEquals(postsDtoResponse, allPostDTO);
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+        Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
     }
 
     @Test
