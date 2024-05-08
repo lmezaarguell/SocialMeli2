@@ -35,16 +35,6 @@ public class PostRepositoryImpl implements IPostRepository {
         this.post = post;
     }
 
-    @Override
-    public Post update(Post post) {
-        return null;
-    }
-
-    @Override
-    public void delete(int id) {
-
-    }
-
     public List<Post> loadData(){
         List<Post> posts = new ArrayList<>();
         String route = "classpath:post.json";

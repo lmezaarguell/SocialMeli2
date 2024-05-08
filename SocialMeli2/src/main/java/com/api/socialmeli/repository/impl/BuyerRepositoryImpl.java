@@ -20,10 +20,6 @@ public class BuyerRepositoryImpl implements IBuyerRepository {
         this.buyers = this.loadData();
     }
 
-    @Override
-    public Buyer save() {
-        return null;
-    }
 
     @Override
     public Buyer getById(Integer id) {
@@ -38,16 +34,6 @@ public class BuyerRepositoryImpl implements IBuyerRepository {
 
     public void saveAll(List<Buyer> buyers) {
         this.buyers = buyers;
-    }
-
-    @Override
-    public Buyer update(Buyer buyer) {
-        return null;
-    }
-
-    @Override
-    public void delete(Integer id) {
-
     }
 
     @Override
