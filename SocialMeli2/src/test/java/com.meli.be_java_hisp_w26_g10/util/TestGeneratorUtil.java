@@ -94,22 +94,34 @@ public class TestGeneratorUtil {
         return new Buyer(10, "Warren Buffett,",
                 List.of(new Seller(1,"Jeff Bezos"),
                         new Seller(2,"Steve Jobs")
-                        ));
+                ));
+    }
+
+    public static Buyer buyersWithoutSellers() {
+        return new Buyer(10, "Warren Buffett",
+                new ArrayList<>());
+
+    }
+
+    public static Buyer buyersWithSellersWithoutPost() {
+        return new Buyer(10, "Isabel Medina",
+                List.of(new Seller(180,"Camilo Vazquez")));
+
     }
 
 
     private static List<Product> productsPostListOrderTest() {
         return  List.of(
-        new Product(1, "Smartphone Galaxy S21", "Samsung", "Electrónico",
-                "Negro", "Nuevo en caja"),
-        new Product(2, "Portátil MacBook Air", "Apple", "Electrónico",
-                "Gris", "Usado en excelente estado"),
-        new Product(3, "Zapatillas Running UltraBoost 21", "Adidas", "Calzado",
-                "Blanco", "Con tecnología Boost"),
-        new Product(4, "Cámara Mirrorless EOS R5", "Canon", "Fotografía",
-                "Negro", "Grabación 8K"),
-        new Product(5, "Smartphone Galaxy S21", "Samsung", "Electrónico",
-                "Negro", "Nuevo en caja"));
+                new Product(1, "Smartphone Galaxy S21", "Samsung", "Electrónico",
+                        "Negro", "Nuevo en caja"),
+                new Product(2, "Portátil MacBook Air", "Apple", "Electrónico",
+                        "Gris", "Usado en excelente estado"),
+                new Product(3, "Zapatillas Running UltraBoost 21", "Adidas", "Calzado",
+                        "Blanco", "Con tecnología Boost"),
+                new Product(4, "Cámara Mirrorless EOS R5", "Canon", "Fotografía",
+                        "Negro", "Grabación 8K"),
+                new Product(5, "Smartphone Galaxy S21", "Samsung", "Electrónico",
+                        "Negro", "Nuevo en caja"));
     }
 
     public static List<Post> postListOrderTestOutOrder(){
@@ -123,6 +135,20 @@ public class TestGeneratorUtil {
                 new Post(4, LocalDate.now().minusDays(3),  1, 2500000.0, 1,
                         productsPostListOrderTest().get(3), false, 0.0),
                 new Post(5, LocalDate.now().minusDays(4),  2, 800000.0, 2,
+                        productsPostListOrderTest().get(4), false, 0.0));
+    }
+
+    public static List<Post> postList(){
+        return Arrays.asList(
+                new Post(1, LocalDate.now().minusDays(0), 1, 1500000.0, 1,
+                        productsPostListOrderTest().get(0), false, 0.0),
+                new Post(2, LocalDate.now().minusDays(1),  1, 3200000.0, 1,
+                        productsPostListOrderTest().get(1), false, 0.0),
+                new Post(3, LocalDate.now().minusDays(30),  1, 1800000.0, 1,
+                        productsPostListOrderTest().get(2), false, 0.0),
+                new Post(4, LocalDate.now().minusDays(20),  1, 2500000.0, 1,
+                        productsPostListOrderTest().get(3), false, 0.0),
+                new Post(5, LocalDate.now().minusDays(90),  2, 800000.0, 2,
                         productsPostListOrderTest().get(4), false, 0.0));
     }
 
@@ -171,3 +197,4 @@ public class TestGeneratorUtil {
         );
     }
 }
+
