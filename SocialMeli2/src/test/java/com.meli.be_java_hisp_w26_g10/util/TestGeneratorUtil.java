@@ -13,17 +13,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-
-import com.api.socialmeli.entity.Buyer;
-import com.api.socialmeli.entity.Seller;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import com.api.socialmeli.entity.Post;
 import com.api.socialmeli.entity.Product;
 
 import java.time.LocalDate;
-import java.util.*;
+
+import com.api.socialmeli.dto.UserDto;
+import java.util.Collections;
 
 public class TestGeneratorUtil {
     public static String orderAsc = "name_asc";
@@ -137,5 +134,40 @@ public class TestGeneratorUtil {
     }
     public static List<Seller> createSellerEnvironment(){
         return List.of(new Seller(1,"Meli"), new Seller(2,"Adidas"),new Seller(3,"Levis"));
+    }
+
+    public static List<Buyer> generateBuyerList(){
+        return new ArrayList<>(
+                List.of(
+                        new Buyer(1, "Antonio", Collections.emptyList()),
+                        new Buyer(2, "Cesar", Collections.emptyList()),
+                        new Buyer(3, "Jorge", Collections.emptyList()),
+                        new Buyer(4, "Octavio", Collections.emptyList()),
+                        new Buyer(5, "Zapata", Collections.emptyList())
+                )
+        );
+    }
+
+    public static List<UserDto> generateUserDtoList(){
+        return new ArrayList<>(
+                List.of(
+                        new UserDto(
+                                3,
+                                "Zapata"
+                        ),
+                        new UserDto(
+                                1,
+                                "Antonio"
+                        ),
+                        new UserDto(
+                                2,
+                                "Octavio"
+                        ),
+                        new UserDto(
+                                4,
+                                "Cesar"
+                        )
+                )
+        );
     }
 }
