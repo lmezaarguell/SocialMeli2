@@ -102,5 +102,77 @@ public class PostServiceTest {
         Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
     }
 
+    @Test
+    @DisplayName("Testeo de ejecucion de ordenamiendo por fecha descendente")
+    public void testOrderDescPosts() {
+        Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
+
+        List<Post> posts = TestGeneratorUtil.postListOrderAscTest();
+
+        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
+        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+        Mockito.when(postRepository.getAll()).thenReturn(posts);
+
+        List<PostDto> posts2 = postService.getPostsByFollowed(buyer.getUser_id() ,"date_desc").getPosts();
+
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+        Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
+    }
+
+    @Test
+    @DisplayName("Testeo de ejecucion de ordenamiendo por fecha ascendente")
+    public void testOrderAscPost() {
+        Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
+
+        List<Post> posts = TestGeneratorUtil.postListOrderAscTest();
+
+        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
+        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+        Mockito.when(postRepository.getAll()).thenReturn(posts);
+
+        List<PostDto> posts2 = postService.getPostsByFollowed(buyer.getUser_id() ,"date_asc").getPosts();
+
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+        Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
+    }
+
+    @Test
+    @DisplayName("Testeo de ejecucion de ordenamiento por fecha con variable null")
+    public void testOrderPostWithNull() {
+        Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
+
+        List<Post> posts = TestGeneratorUtil.postListOrderAscTest();
+
+        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
+        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+        Mockito.when(postRepository.getAll()).thenReturn(posts);
+
+        List<PostDto> posts2 = postService.getPostsByFollowed(buyer.getUser_id() ,null).getPosts();
+
+        Mockito.verify(buyerService, Mockito.atLeastOnce()).getBuyerById(buyer.getUser_id());
+        Mockito.verify(postRepository, Mockito.atLeastOnce()).getAll();
+    }
+
+    @Test
+    @DisplayName("Testeo de ejecucion de ordenamiento por fecha sin palabra clave")
+    public void testOrderPostWithoutKey() {
+        Buyer buyer = TestGeneratorUtil.buyersPostListOrderTest();
+
+        List<Post> posts = TestGeneratorUtil.postListOrderAscTest();
+
+        buyerRepository.saveAll(List.of(TestGeneratorUtil.buyersPostListOrderTest()));
+        postRepository.saveAll(TestGeneratorUtil.postListOrderTestOutOrder());
+
+        Mockito.when(buyerService.getBuyerById(buyer.getUser_id())).thenReturn(buyer);
+        Mockito.when(postRepository.getAll()).thenReturn(posts);
+
+        Assertions.assertThrows(BadRequestException.class, ()-> postService.getPostsByFollowed(buyer.getUser_id() ,"").getPosts());
+    }
 
 }
