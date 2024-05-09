@@ -31,14 +31,8 @@ public class PostRepositoryImpl implements IPostRepository {
         return post;
     }
 
-    @Override
-    public Post update(Post post) {
-        return null;
-    }
-
-    @Override
-    public void delete(int id) {
-
+    public void saveAll(List<Post> post) {
+        this.post = post;
     }
 
     public List<Post> loadData(){
@@ -60,13 +54,20 @@ public class PostRepositoryImpl implements IPostRepository {
         return posts;
     }
 
-    // MCaldera - Funcion de busqueda de valor maximo ´post_id´en json, para generar consecutivo
+    /**
+     *
+     * @return retorna el consecutivo para la creacion de posts
+     */
     @Override
     public int searchPostId(){
         int max = this.post.stream().mapToInt(Post::getPost_id).max().orElse(0);
         return max + 1;
     }
 
+    /**
+     *
+     * @param post: Objeto a almacenar
+     */
     @Override
     public void savePost(Post post){
         this.post.add(post);

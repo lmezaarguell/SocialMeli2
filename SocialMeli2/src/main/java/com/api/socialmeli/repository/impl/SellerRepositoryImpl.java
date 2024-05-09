@@ -20,29 +20,15 @@ public class SellerRepositoryImpl implements ISellerRepository {
     }
 
     @Override
-    public void save() {
-
-    }
-
-    @Override
     public Seller getById(Integer id) {
         return sellers.stream().filter(
                 s -> s.getUser_id().equals(id)).findFirst().orElse(null);
     }
 
+    //test
     @Override
     public List<Seller> getAll() {
         return sellers;
-    }
-
-    @Override
-    public Seller update(Seller seller) {
-        return null;
-    }
-
-    @Override
-    public void delete(int id) {
-
     }
 
     public List<Seller> loadData(){

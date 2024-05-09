@@ -7,9 +7,11 @@ import com.api.socialmeli.entity.Buyer;
 import com.api.socialmeli.entity.Seller;
 import com.api.socialmeli.exception.BadRequestException;
 import com.api.socialmeli.exception.NotFoundException;
+import com.api.socialmeli.mapper.ListUserMapper;
 import com.api.socialmeli.repository.IBuyerRepository;
 import com.api.socialmeli.repository.ISellerRepository;
 import com.api.socialmeli.service.ISellerService;
+import com.api.socialmeli.utils.FollowersOfSellerValidation;
 import com.api.socialmeli.utils.UserDtoShort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,14 @@ public class SellerServiceImpl implements ISellerService {
         return seller;
     }
 
-    // Obtenemos la cuenta de las personas que siguen a un determinado vendedor
+    /**
+     * US-0002: Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor
+     *
+     * Obtenemos el total de followers que tiene un determinado vendedor
+     * @param user_id id del usuario vendedor que buscamos
+     * @return Devolvemos el DTO relacionado a la forma en que necesitamos visualizar
+     * el numero total de followers de un determinado vendedor
+     */
     @Override
     public SellersCountFollowersDto getCountOfSellerFollowers(Integer user_id) {
         //Obtenemos la lista de los vendedores y compradores
@@ -79,20 +88,17 @@ public class SellerServiceImpl implements ISellerService {
 
     }
 
-    /*
-    * US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?)
-    * */
+    /**
+     * @descripcion: US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?)
+     * @param seller_id
+     * @param order
+     * @return returna la informacion de un vendedor mas su lista de seguidores con un order
+     */
     @Override
     public FollowedBySellerDto getFollowersOfSeller(int seller_id, String order) {
-        /* se realiza validacion dentro del id del venedor enviado */
-        if(seller_id <= 0){
-            throw new BadRequestException("El id del vendedor no puede ser menor o igual a cero");
-        }
-
-        /* se realiza validacion dentro del order enviado */
-        if(!order.equals("name_desc") && !order.equals("name_asc") && !order.equals("")){
-            throw new BadRequestException("El tipo de ordenamiento no es el permitido");
-        }
+        /* se comprueba el correcto formato de seller_id y de order */
+        FollowersOfSellerValidation.isValidSellerId(seller_id);
+        FollowersOfSellerValidation.isValidOrder(order);
 
         /* se comprueba que el vendedor exista */
         Seller seller = iSellerRepository.getById(seller_id);
@@ -107,7 +113,7 @@ public class SellerServiceImpl implements ISellerService {
         }
 
         /* se busca si el comprador sigue al vendedor y se agrega el comprador a
-        * lista de seguidos */
+        * lista de seguidores del vendedor */
         List<Buyer> buyersFollowers = new ArrayList<>();
         for(Buyer buyer: buyers){
             Optional<Seller> sellerExist = buyer.getFollowed().stream()
@@ -123,9 +129,7 @@ public class SellerServiceImpl implements ISellerService {
         }
 
         /* se crea su dto de respuesta */
-        List<UserDto> followersDto = buyersFollowers.stream()
-                .map(buyer -> new UserDto(buyer.getUser_id(), buyer.getUser_name()))
-                .collect(Collectors.toList());
+        List<UserDto> followersDto = ListUserMapper.buyerListToUserDtoList(buyersFollowers);
 
         /* se comprueba forma de ordenamiento y se aplica el correspondiente*/
         List<UserDto> sortedList = UserDtoShort.sortList(followersDto, order);
